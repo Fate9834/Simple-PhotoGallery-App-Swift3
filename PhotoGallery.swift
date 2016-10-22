@@ -361,9 +361,10 @@ class PhotoGallery: UIViewController, UICollectionViewDataSource, UICollectionVi
             // Set thumbnail for cell
             let photoInstance: PHAsset = self.photos[indexPath.item] as PHAsset
             
-//===================================== Location lab updated incorrectly
             if photoInstance.location != nil {
                 photoCell.setLocationLabel(location: photoInstance.location!)
+            } else {
+                photoCell.locationLabelSmall.text = "Location Not Available"
             }
             
             let targetSize = CGSize(width: photoCell.bounds.width * 2, height: photoCell.bounds.height * 2)
