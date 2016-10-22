@@ -361,10 +361,9 @@ class PhotoGallery: UIViewController, UICollectionViewDataSource, UICollectionVi
             // Set thumbnail for cell
             let photoInstance: PHAsset = self.photos[indexPath.item] as PHAsset
             
-            let thumbNailLocation: CLLocation? = photoInstance.location
 //===================================== Location lab updated incorrectly
-            if thumbNailLocation != nil {
-                photoCell.setLocationLabel(location: thumbNailLocation!)
+            if photoInstance.location != nil {
+                photoCell.setLocationLabel(location: photoInstance.location!)
             }
             
             let targetSize = CGSize(width: photoCell.bounds.width * 2, height: photoCell.bounds.height * 2)
@@ -391,14 +390,6 @@ class PhotoGallery: UIViewController, UICollectionViewDataSource, UICollectionVi
                         let assetToCreate = PHAssetChangeRequest.creationRequestForAsset(from: image)
                     
                         assetToCreate.location = self.photoLocation // Adding geotag
-                    
-                        /*
-                        if let location: CLLocation = assetToCreate.location {
-                            let latitude = location.coordinate.latitude
-                            let longitude = location.coordinate.longitude
-                            
-                            print(String(format: "%.4f", longitude) + ", " + String(format: "%.4f", latitude))
-                        }*/
                     
                         // Clean used geo tag
                         self.photoLocation = nil

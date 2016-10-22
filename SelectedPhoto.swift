@@ -27,23 +27,7 @@ class SelectedPhoto: UIViewController {
         
         alert.addAction(UIAlertAction(title: "Delete From Local", style: .default,
             handler: {(alertAction) in
-                PHPhotoLibrary.shared().performChanges({
-                        //Delete photo locally
-                        PHAssetChangeRequest.deleteAssets([self.photos[self.index]] as NSArray)
-                    },
-                    completionHandler: {(success, error) -> Void in
-                        alert.dismiss(animated: true, completion: nil)
-                        
-                        if success {
-                            // Move to the main thread to execute
-                            DispatchQueue.main.async(execute: {
-                                _ = self.navigationController?.popToRootViewController(animated: true)
-                            })
-                        } else {
-                            print("Error: \(error)")
-                        }
-                    }
-                )
+                self.removePhoto(alert: alert)
             })
         )
         
@@ -60,23 +44,7 @@ class SelectedPhoto: UIViewController {
                     }
                 })
 
-                PHPhotoLibrary.shared().performChanges({
-                        //Delete Photo locally
-                        PHAssetChangeRequest.deleteAssets([self.photos[self.index]] as NSArray)
-                    },
-                    completionHandler: {(success, error) -> Void in
-                        alert.dismiss(animated: true, completion: nil)
-                    
-                        if success {
-                            // Move to the main thread to execute
-                            DispatchQueue.main.async(execute: {
-                                _ = self.navigationController?.popToRootViewController(animated: true)
-                            })
-                        } else {
-                            print("Error: \(error)")
-                        }
-                    }
-                )
+                self.removePhoto(alert: alert)
             })
         )
         
@@ -116,6 +84,39 @@ class SelectedPhoto: UIViewController {
             
             self.locationLabel.text = (String(format: "%.4f", longitude) + ", " + String(format: "%.4f", latitude))
         }
+    }
+    
+    func removePhoto(alert: UIAlertController) {
+        PHPhotoLibrary.shared().performChanges({
+                //Delete photo locally
+                PHAssetChangeRequest.deleteAssets([self.photos[self.index]] as NSArray)
+            },
+            completionHandler: {(success, error) -> Void in
+                alert.dismiss(animated: true, completion: nil)
+                
+                if success {
+                    // Move to the main thread to execute
+                    DispatchQueue.main.async(execute: {
+                        self.photos = PHAsset.fetchAssets(with: PHAssetMediaType.image, options: nil) as PHFetchResult<PHAsset>
+                        
+                        if self.photos.count == 0 {
+                            print("No Images Left!!")
+                            
+                            _ = self.navigationController?.popToRootViewController(animated: true)
+                        } else {
+                            if self.index == self.photos.count {
+                                // If we are at the end of array, must step back to prevent out of bound error
+                                self.index = self.photos.count - 1
+                            }
+                            
+                            self.displayPhoto()
+                        }
+                    })
+                } else {
+                    print("Error: \(error)")
+                }
+            }
+        )
     }
     
     func removeSpecialCharsFromString(text: String) -> String {
